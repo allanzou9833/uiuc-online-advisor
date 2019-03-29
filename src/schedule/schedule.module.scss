@@ -1,0 +1,15 @@
+.add-new-card {
+  cursor: pointer;
+  div {
+    border-style: dashed;
+    border-width: thin;
+    height: 100%;
+    img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      margin: 20% 33% 25%;
+      height: 50%;
+    }
+  }
+}
