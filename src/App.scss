@@ -2,5 +2,8 @@
   text-align: center;
   height: 100%;
 }
-
+.ui.search > .results {
+  overflow-y: auto;
+  max-height: 20rem;
+}
 

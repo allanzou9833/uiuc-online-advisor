@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Grid, Form } from 'semantic-ui-react'
 import styles from './schedule.module.scss'
 import axios from 'axios';
+// import _ from 'lodash';
 import { generatePath } from 'react-router-dom';
 
 class ScheduleForm extends Component {
@@ -9,61 +10,92 @@ class ScheduleForm extends Component {
     super(props);
     this.state = {
       classes: [],
-      semester: '',
-      year: '',
-      name: ''
+      semester: 'FA',
+      year: 2019,
+      name: '',
+      classList: []
     }
   }
+  // componentWillReceiveProps(nextProps){
+  //   if(nextProps.classList !== this.props.classList){
+  //     // console.log(this.state.semester)
+  //     // console.log(this.state.year)
+  //     // console.log(nextProps.classList)
+  //     this.setState({ 
+  //       classList: nextProps.classList.filter(e => e.semester === this.state.semester && e.year === this.state.year)
+  //     }) 
+  //   }
+  // }
 
   componentWillMount(props) {
+    this.setState({ 
+      classList: this.props.classList.filter(e => e.semester === this.state.semester && e.year === this.state.year)
+    })
+    const config = {
+      headers: {
+        "Authorization": `bearer ${sessionStorage.getItem('jwt')}`
+      }
+    }
     if(Object.keys(this.props.match.params).length !== 0){
-      axios.get(`/schedules/${this.props.match.params.id}`)
-      .then(response => {
-        this.setState({ 
-          name: response.data.name, 
-          classes: response.data.classes
+      axios.get(`/schedules/${this.props.match.params.id}`, config)
+        .then(response => {
+          this.setState({ 
+            name: response.data.name, 
+            classes: response.data.classes
+          })
         })
-      })
-      .catch(error => console.log(error))
+        .catch(error => console.log(error))
     }
   }
 
   handleChangeClasses = (e, { value }) => this.setState({ classes: value })
-  handleChangeSemester = (e, { value }) => this.setState({ semester: value })
-  handleChangeYear = (e, { value }) => this.setState({ year: value })
+  handleChangeSemester = (e, { value }) => {
+    this.setState({ semester: value }, () => {
+      this.setState({ 
+        classList: this.props.classList.filter(e => e.semester === this.state.semester && e.year === this.state.year)
+      })
+    }) 
+  }
+  handleChangeYear = (e, { value }) => {
+    this.setState({ year: value }, () => {
+      this.setState({ 
+        classList: this.props.classList.filter(e => e.semester === this.state.semester && e.year === this.state.year)
+      })
+    })
+  }
   handleChangeName = (e) => this.setState({ name: e.target.value })
 
   handleSubmit = (e) => {
+    const data = {
+      classes: this.state.classes,
+      name: this.state.name
+    }
+    const config = {
+      headers: {
+        "Authorization": `bearer ${sessionStorage.getItem('jwt')}`
+      }
+    }
+
     if(Object.keys(this.props.match.params).length === 0){
-      axios.post('/schedules', {
-        data: {
-          user_id: 1,
-          classes: this.state.classes,
-          name: this.state.name
-        }
-      })
-      .then(response => this.props.history.push(generatePath("/schedules")))
-      .catch(error => console.log(error))
+      axios.post('/schedules', data, config)
+        .then(response => this.props.history.push(generatePath("/schedules")))
+        .catch(error => console.log(error))
     }
     else {
-      axios.put(`/schedules/${this.props.match.params.id}`, {
-        data: {
-          classes: this.state.classes,
-          name: this.state.name
-        }
-      })
-      .then(response => this.props.history.push(generatePath("/schedules")))
-      .catch(error => console.log(error))
+      axios.put(`/schedules/${this.props.match.params.id}`, data, config)
+        .then(response => this.props.history.push(generatePath("/schedules")))
+        .catch(error => console.log(error))
     }
   }
 
   render(){
-    const { classes, semester, year, name } = this.state
-    const classOptions = this.props.classList.map(item => (
+    const { classes, semester, year, name, classList } = this.state
+    // const { classList } = this.props
+    const classOptions = classList.map(e => (
       {
-        key: item.crn,
-        value: item.crn,
-        text: `${item.dept}${item.course_num}`
+        key: e.id,
+        value: e.id,
+        text: `${e.subject}${e.course_num}`
       }
     ))
     const semesterOptions = [
@@ -88,7 +120,7 @@ class ScheduleForm extends Component {
         text: 'Winter'
       },
     ]
-    const yearOptions = [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024].map(year => ({key: year, value: year, text: year}))
+    const yearOptions = [2015, 2016, 2017, 2018, 2019].map(year => ({key: year, value: year, text: year}))
 
     return(
       <Grid centered columns={2}>
