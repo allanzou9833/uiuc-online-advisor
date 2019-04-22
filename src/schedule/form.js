@@ -50,14 +50,14 @@ class ScheduleForm extends Component {
 
   handleChangeClasses = (e, { value }) => this.setState({ classes: value })
   handleChangeSemester = (e, { value }) => {
-    this.setState({ semester: value }, () => {
+    this.setState({ semester: value, classes: [] }, () => {
       this.setState({ 
         classList: this.props.classList.filter(e => e.semester === this.state.semester && e.year === this.state.year)
       })
     }) 
   }
   handleChangeYear = (e, { value }) => {
-    this.setState({ year: value }, () => {
+    this.setState({ year: value, classes: [] }, () => {
       this.setState({ 
         classList: this.props.classList.filter(e => e.semester === this.state.semester && e.year === this.state.year)
       })
