@@ -6,7 +6,7 @@ import App from './App';
 import * as serviceWorker from './serviceWorker';
 import axios from 'axios';
 
-axios.defaults.baseURL = 'http://localhost:5000'
+axios.defaults.baseURL = 'https://uiuc-online-advisor-server.herokuapp.com'
 
 ReactDOM.render(<App />, document.getElementById('root'));
 
